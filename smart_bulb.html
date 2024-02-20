@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="toogleswitch.css">
+
+    <!-- import MQTT over WebSockets Client (for real-time dashboard / sensor comm ) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"
+        type="text/javascript"></script>
+    <style>
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        .bulb {
+            margin: 20px;
+            /*  border-style: solid;
+            border-color: red; */
+            text-align: center;
+            margin-left: .75%;
+            /* background-color: rgba(0, 0, 0, 1.0); */
+            margin-top: 5%;
+            margin-bottom: 5%;
+            padding: 1em;
+            z-index: 2;
+        }
+
+        .greeting {
+            text-align: center;
+            color: green;
+            border: 15px solid green;
+            height: 150px;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            margin: 30px;
+            /*  margin-top: 43%; */
+            margin-right: 40px;
+        }
+
+        input {
+            margin: 10px;
+        }
+
+        .greetingheader {
+            /* background-image: url("rpi1.jpg"); */
+            background-size: 100%;
+            width: 100%;
+            height: 100%;
+            margin-top: 0%;
+
+        }
+
+        .switchCont {
+            text-align: center;
+        }
+
+        div.switchCont>label {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<img style="margin:20px;width: 80%;" src="./logo.png" alt="">
+
+<body class="greetingheader">
+
+    <div class="greeting" id="greetingId">
+        <label for="tname">Enter Team Name:</label>
+        <input type="text" id="tname">
+        <button onclick="ProcessGreeting()"> Submit </button>
+    </div>
+
+    <div id="bulbId" style="visibility: hidden">
+
+        <div class="bulb">
+
+            <h1 style="color: green;" id="hellomsgId"></h1>
+            <h2 style="color: green;"> Smart Light Bulb Prototype: ver .09 </h3>
+
+                <img id="bulbimgId" src="bulb_off.png" width="30%" height="50%">
+
+                <br />
+                <!-- Rectangular switch -->
+                <div class="switch">
+                    <label class="switchCont">
+                        <input type="checkbox" onclick="toggleSwitch()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <br>
+                <label> Light switch </label>
+                <p>Toggle the switch to turn the bulb on/off.</p>
+        </div>
+    </div>
+
+    <script>
+        let switch_on = false;
+        var mqtt;
+        let reconnectTimeout = 2000;
+        let host = "192.168.12.214";
+
+        //var host = "test.mosquitto.org";
+        //var port = 8080
+        var port = 9001;
+        //var port=8881;
+
+        function toggleSwitch() {
+
+            switch_on = !switch_on;
+
+            var image = document.getElementById('bulbimgId');
+
+            if (switch_on) {
+                image.src = "bulb_on.png";
+                message = new Paho.MQTT.Message("on");
+                message.destinationName = "bulb";
+                mqtt.send(message);
+
+            } else {
+                image.src = "bulb_off.png";
+                message = new Paho.MQTT.Message("off");
+                message.destinationName = "bulb";
+                mqtt.send(message);
+            }
+        }
+
+        function showBulb() {
+            let elem = document.getElementById("hellomsgId");
+            elem.innerHTML = "Welcome to ORION Pi Day! Team: <span style=\"color:red\">" +
+                document.getElementById("tname").value + "</span>";
+
+            // let greetingheader = document.getElementById("greetingheader");
+            //greetingheader.firstChild.remove();
+
+           let greetingElem = document.getElementById("greetingId");
+            greetingElem.style.visibility = "hidden";
+           greetingElem.style.margin = "5%";
+            document.getElementById("bulbId").style.visibility = "visible";
+        }
+
+        function ProcessGreeting() {
+
+            if (document.getElementById("tname").value != "")
+                MQTTconnect();
+            else
+                alert("Please Enter your Team Name");
+        }
+
+
+        function onFailure(msg) {
+            console.log("Connection Attempt to host: " + host + ", failed" + msg);
+            alert("MQTT over Websockets Connection Attempt to Raspberry Pi at:-> " + host + ":" + port + " failed");
+            setTimeout(MQTTconnect, reconnectTimeout);
+        }
+
+        function onConnect() {
+            // Once a connection has been made, make a subscription and send a message.
+            console.log("Connected to MQTT Broker, using WebSockets");
+
+            showBulb();
+
+
+            // message = new Paho.MQTT.Message("Hello World");
+            // message.destinationName = "sensor1";
+            // mqtt.send(message);
+        }
+
+
+        function MQTTconnect() {
+            console.log("Connecting to " + host + " " + port);
+            // var x = Math.floor(Math.random() * 10000);
+            // var cname = "orderform-" + x;
+            mqtt = new Paho.MQTT.Client(host, port, "dashboard");
+
+            var options = {
+                timeout: 3,
+                onSuccess: onConnect,
+                onFailure: onFailure
+            };
+
+            // mqtt.onMessageArrived = onTelemetryDataArrived;
+            mqtt.connect(options); //connect
+        }
+    </script>
+</body>
+</html>
