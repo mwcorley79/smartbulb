@@ -4,6 +4,8 @@
 <head>
     <link rel="stylesheet" href="toogleswitch.css">
 
+  
+     <!-- reference:  http://www.steves-internet-guide.com/using-javascript-mqtt-client-websockets/ -->
     <!-- import MQTT over WebSockets Client (for real-time dashboard / sensor comm ) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"
         type="text/javascript"></script>
@@ -101,7 +103,7 @@
         let switch_on = false;
         var mqtt;
         let reconnectTimeout = 2000;
-        let host = "192.168.12.214";
+        let host = "192.168.1.10";
 
         //var host = "test.mosquitto.org";
         //var port = 8080
