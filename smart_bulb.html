@@ -2,8 +2,7 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="toogleswitch.css">
-
+    <link rel="stylesheet" href="./css/toogleswitch.css">
 
     <!-- reference:  http://www.steves-internet-guide.com/using-javascript-mqtt-client-websockets/ -->
     <!-- import MQTT over WebSockets Client (for real-time dashboard / sensor comm ) -->
@@ -66,7 +65,7 @@
     </style>
 </head>
 
-<img style="margin:20px;width: 80%;" src="./logo.png" alt="">
+<img style="margin:20px;width: 80%;" src="./images/logo.png" alt="">
 
 <body class="greetingheader">
 
@@ -83,7 +82,7 @@
             <h1 style="color: green;" id="hellomsgId"></h1>
             <h2 style="color: green;"> Smart Light Bulb Prototype: ver .09 </h3>
 
-                <img id="bulbimgId" src="bulb_off.png" width="30%" height="50%">
+                <img id="bulbimgId" src="./images/bulb_off.png" width="30%" height="50%">
 
                 <br />
                 <!-- Rectangular switch -->
@@ -114,13 +113,13 @@
             var image = document.getElementById('bulbimgId');
 
             if (switch_on) {
-                image.src = "bulb_on.png";
+                image.src = "./images/bulb_on.png";
                 message = new Paho.MQTT.Message("on");
                 message.destinationName = "bulb";
                 mqtt.send(message);
 
             } else {
-                image.src = "bulb_off.png";
+                image.src = "./images/bulb_off.png";
                 message = new Paho.MQTT.Message("off");
                 message.destinationName = "bulb";
                 mqtt.send(message);
@@ -142,7 +141,6 @@
         }
 
         function ProcessGreeting() {
-
             if (document.getElementById("tname").value != "")
                 MQTTconnect();
             else
