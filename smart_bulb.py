@@ -21,8 +21,11 @@
 import RPi.GPIO as GPIO
 import paho.mqtt.client as paho
 
-ledPin = 23 # Broadcom pin 23 (Pi pin 16)
-broker="192.168.12.214"
+import string
+import random
+
+ledPin = 23  #Broadcom pin 23 (Pi pin 16)
+broker="127.0.0.1"
 port=9001
 
 GPIO.setmode(GPIO.BCM) # Broadcom pin-numbering scheme
@@ -44,21 +47,46 @@ def on_publish(client,userdata,result):             #create function for callbac
 
 
 def on_message(client,userdata,msg):
-    print("Received: Topic" + msg.topic + " Message: " + msg.payload.decode() )
+    print("Received Topic: " + msg.topic + " Message: " + msg.payload.decode() )
     dmsg =  msg.payload.decode()
     DoLightBulbCommand(dmsg);
 
    
+def GetName(N):
+    # N = size of string
+    # using random.choices()
+    # generating random strings
+    res = ''.join(random.choices(string.ascii_lowercase +
+                             string.digits, k=N))
+    return res
+
+
+
+def on_connect_fail(msg):
+     print("Could not connect to MQTT Broker at " + broker + ":" + port);
+
+
+def on_connect(client, userdata, flags, rc):
+    print("Python Client connected over web sockets with result: " + str(rc));
+    
+    subscription1 = "bulb"
+    client.subscribe(subscription1);     
+    print("Subscribed to topic: " + subscription1);
+
+
 
 try:
-    client= paho.Client("control1",transport="websockets");
-    # client1.on_publish = on_publish    
-    # client1.on_message = on_message;                     #assign function to callback
-    client.connect(broker,port)                                 #establish connection
-    #ret= client1.publish("smart/bulb","on")  
-    client.subscribe("bulb");   
-    client.on_message = on_message;
+    client_name = GetName(10) +"_client"
+    client= paho.Client(client_name,transport="websockets")
+             
+    client.connect(broker,port)   #establish connection
+    print("client " + client_name)
+   
+    client.on_message = on_message;  #assign function to callback
+    client.on_connect = on_connect; 
+    client.on_connect_fail = on_connect_fail;
     client.loop_forever();
+
 except KeyboardInterrupt: # If CTRL+C is pressed, exit cleanly:
     GPIO.cleanup() # cleanup all GPIO
     print("All done! bye!");

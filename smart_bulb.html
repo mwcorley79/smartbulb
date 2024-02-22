@@ -4,8 +4,8 @@
 <head>
     <link rel="stylesheet" href="toogleswitch.css">
 
-  
-     <!-- reference:  http://www.steves-internet-guide.com/using-javascript-mqtt-client-websockets/ -->
+
+    <!-- reference:  http://www.steves-internet-guide.com/using-javascript-mqtt-client-websockets/ -->
     <!-- import MQTT over WebSockets Client (for real-time dashboard / sensor comm ) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"
         type="text/javascript"></script>
@@ -103,12 +103,9 @@
         let switch_on = false;
         var mqtt;
         let reconnectTimeout = 2000;
-        let host = "192.168.1.10";
-
-        //var host = "test.mosquitto.org";
-        //var port = 8080
+        let host = "viperpi.local";
         var port = 9001;
-        //var port=8881;
+
 
         function toggleSwitch() {
 
@@ -138,9 +135,9 @@
             // let greetingheader = document.getElementById("greetingheader");
             //greetingheader.firstChild.remove();
 
-           let greetingElem = document.getElementById("greetingId");
+            let greetingElem = document.getElementById("greetingId");
             greetingElem.style.visibility = "hidden";
-           greetingElem.style.margin = "5%";
+            greetingElem.style.margin = "5%";
             document.getElementById("bulbId").style.visibility = "visible";
         }
 
@@ -172,11 +169,24 @@
         }
 
 
+        // source:  https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+        function makeid(length) {
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const charactersLength = characters.length;
+            let counter = 0;
+            while (counter < length) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                counter += 1;
+            }
+            return result;
+        }
+
+
         function MQTTconnect() {
             console.log("Connecting to " + host + " " + port);
-            // var x = Math.floor(Math.random() * 10000);
-            // var cname = "orderform-" + x;
-            mqtt = new Paho.MQTT.Client(host, port, "dashboard");
+            let cname = "bulb_" + makeid(7)
+            mqtt = new Paho.MQTT.Client(host, port, cname);
 
             var options = {
                 timeout: 3,
@@ -189,4 +199,5 @@
         }
     </script>
 </body>
+
 </html>
